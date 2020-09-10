@@ -90,3 +90,28 @@ def lastrun(connection, script_id):
     lastrun = lastrun[0].strftime('%Y-%m-%d %X')
     
     return lastrun
+
+
+
+
+
+def zip_to_county(connection, zipcode):
+    county = ''
+    cursor = connection.cursor()
+
+    #this query will return the county of the zip code
+
+    query = f'''
+                SELECT County FROM dbo.ZIPCodes WHERE ZipCode = \'{zipcode}\'
+            '''
+
+    cursor.execute(query)
+
+    row = cursor.fetchone()
+
+    if row:
+        county = row[0]
+    else:
+        county = ''
+
+    return county
