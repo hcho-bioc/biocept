@@ -344,3 +344,32 @@ def ocr_text(pdf_path):
     extracted = text
 
     return extracted
+
+
+
+
+
+#this returns patient pdf from azure's blob instance as pdf (filewrite) object
+def azure_patient_report(accession_id):
+    import os, uuid
+    import PyPDF2
+    from io import BytesIO
+    from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient, StorageStreamDownloader, __version__
+
+    connect_str = 'DefaultEndpointsProtocol=https;AccountName=biocept;AccountKey=Dv6p+JDBuaAuk5wmMjcQ1eFHCGPh+oFCG/ff3MGGdy3VOjp/RTPmrW3cMwSME3z1/dr1MatNQyfTSc9vnYf2vw==;EndpointSuffix=core.windows.net'
+
+    blob_service_client = BlobServiceClient.from_connection_string(connect_str)
+    container_client = blob_service_client.get_container_client(accession_id)
+    blob_client = container_client.get_blob_client('patient-reports/Accession_20-34135_132444467323895151.pdf')
+
+    streamdownloader = blob_client.download_blob()
+
+    stream = BytesIO()
+    streamdownloader.download_to_stream(stream)
+
+    filewriter = PyPDF2.PdfFileWriter()
+    filereader = PyPDF2.PdfFileReader(stream)
+
+    filewriter.appendPagesFromReader(filereader)
+
+    return filewriter
