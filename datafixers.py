@@ -360,16 +360,25 @@ def azure_patient_report(accession_id):
 
     blob_service_client = BlobServiceClient.from_connection_string(connect_str)
     container_client = blob_service_client.get_container_client(accession_id)
-    blob_client = container_client.get_blob_client('patient-reports/Accession_20-34135_132444467323895151.pdf')
 
-    streamdownloader = blob_client.download_blob()
+    pt_report = 'default'
+    filewriter = None
 
-    stream = BytesIO()
-    streamdownloader.download_to_stream(stream)
+    for blob in container_client.list_blobs():
+        if 'patient-reports' in blob.name:
+            pt_report = blob.name
+        
+    if pt_report != 'default':
+        blob_client = container_client.get_blob_client(pt_report)
 
-    filewriter = PyPDF2.PdfFileWriter()
-    filereader = PyPDF2.PdfFileReader(stream)
+        streamdownloader = blob_client.download_blob()
 
-    filewriter.appendPagesFromReader(filereader)
+        stream = BytesIO()
+        streamdownloader.download_to_stream(stream)
 
+        filewriter = PyPDF2.PdfFileWriter()
+        filereader = PyPDF2.PdfFileReader(stream)
+
+        filewriter.appendPagesFromReader(filereader)
+    
     return filewriter
