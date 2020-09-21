@@ -350,13 +350,13 @@ def ocr_text(pdf_path):
 
 
 #this returns patient pdf from azure's blob instance as pdf (filewrite) object
-def azure_patient_report(accession_id):
+def azure_patient_report(connection_string, accession_id):
     import os, uuid
     import PyPDF2
     from io import BytesIO
     from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient, StorageStreamDownloader, __version__
 
-    connect_str = 'DefaultEndpointsProtocol=https;AccountName=biocept;AccountKey=Dv6p+JDBuaAuk5wmMjcQ1eFHCGPh+oFCG/ff3MGGdy3VOjp/RTPmrW3cMwSME3z1/dr1MatNQyfTSc9vnYf2vw==;EndpointSuffix=core.windows.net'
+    connect_str = connection_string
 
     blob_service_client = BlobServiceClient.from_connection_string(connect_str)
     container_client = blob_service_client.get_container_client(accession_id)
