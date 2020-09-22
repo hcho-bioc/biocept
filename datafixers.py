@@ -382,3 +382,16 @@ def azure_patient_report(connection_string, accession_id):
         filewriter.appendPagesFromReader(filereader)
     
     return filewriter
+
+
+def random_text():
+    import os
+    import biocept
+    
+    dir_path = os.path.dirname(biocept.__file__)
+    base = r'pdfs\random.txt'
+    path = os.path.join(dir_path,base)
+
+    f = open(path,'r')
+
+    print(f.read())
