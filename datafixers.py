@@ -395,3 +395,116 @@ def random_text():
     f = open(path,'r')
 
     print(f.read())
+
+
+
+
+def florida_report_fill(patient_dict, coordinates_dict):
+    import os
+    import biocept
+    import pdfrw
+    import PyPDF2
+    from io import BytesIO
+    from reportlab.pdfgen import canvas
+    from reportlab.lib.pagesizes import letter
+
+    dir_path = os.path.dirname(biocept.__file__)
+    base_path = r'pdfs\florida_disease_report.pdf'
+    form_path = os.path.join(dir_path,base_path)
+
+    stream = BytesIO()
+    lname = patient_dict['lastname']
+
+    width, height = letter
+    c = canvas.Canvas(stream)
+    c.setFont('Times-Roman', 10)
+    c.setPageSize([width,height])
+
+    c.drawString(coordinates_dict['ssn'][0],coordinates_dict['ssn'][1], patient_dict['ssn'])
+    c.drawString(coordinates_dict['mrn'][0],coordinates_dict['mrn'][1], patient_dict['mrn'])
+    c.drawString(coordinates_dict['lastname'][0],coordinates_dict['lastname'][1], patient_dict['lastname'])
+    c.drawString(coordinates_dict['receiveddate'][0], coordinates_dict['receiveddate'][1], patient_dict['receiveddate'])
+    c.drawString(coordinates_dict['signeddate'][0], coordinates_dict['signeddate'][1], patient_dict['signeddate'])
+    c.drawString(coordinates_dict['firstname'][0], coordinates_dict['firstname'][1], patient_dict['firstname'])
+    if patient_dict['sex'] == 'M':
+        c.drawString(coordinates_dict['male'][0],coordinates_dict['male'][1], 'X')
+    elif patient_dict['sex'] == 'F':
+        c.drawString(coordinates_dict['female'][0],coordinates_dict['female'][1], 'X')
+    else:
+        c.drawString(coordinates_dict['genunkn'][0], coordinates_dict['genunkn'][1], 'X')
+    c.drawString(coordinates_dict['dob'][0], coordinates_dict['dob'][1], patient_dict['dob'])
+    if patient_dict['race'] == 'W':
+        c.drawString(coordinates_dict['White'][0],coordinates_dict['White'][1],'X')
+    elif patient_dict['race'] == 'B':
+        c.drawString(coordinates_dict['Black'][0],coordinates_dict['Black'][1],'X')
+    elif patient_dict['race'] == 'A':
+        c.drawString(coordinates_dict['Asian'][0], coordinates_dict['Asian'][1], 'X')
+    elif patient_dict['race'] == 'I':
+        c.drawString(coordinates_dict['NativeAmerican'][0], coordinates_dict['NativeAmerican'][1], 'X')
+    elif patient_dict['race'] == 'P':
+        c.drawString(coordinates_dict['Asian'][0], coordinates_dict['Asian'][1], 'X')
+    elif patient_dict['race'] == 'O':
+        c.drawString(coordinates_dict['Other'][0], coordinates_dict['Other'][1], 'X')
+    else:
+        c.drawString(coordinates_dict['UnknownRace'][0], coordinates_dict['UnknownRace'][1], 'X')
+    if patient_dict['ethnicity'] == 'H':
+        c.drawString(coordinates_dict['Hispanic'][0], coordinates_dict['Hispanic'][1], 'X')
+    elif patient_dict['ethnicity'] == 'NH':
+        c.drawString(coordinates_dict['NonHispanic'][0], coordinates_dict['NonHispanic'][1], 'X')
+    else:
+        c.drawString(coordinates_dict['UnknownEth'][0], coordinates_dict['UnknownEth'][1], 'X')
+    c.drawString(coordinates_dict['Address'][0], coordinates_dict['Address'][1], patient_dict['address'])
+    c.drawString(coordinates_dict['ZIP'][0], coordinates_dict['ZIP'][1], patient_dict['ZIP'])
+    c.drawString(coordinates_dict['City'][0], coordinates_dict['City'][1], patient_dict['City'])
+    c.drawString(coordinates_dict['State'][0], coordinates_dict['State'][1], 'FL')
+    c.drawString(coordinates_dict['Phone'][0], coordinates_dict['Phone'][1], patient_dict['Phone'])
+    if patient_dict['sex'] == 'F':
+        if patient_dict['Pregnant'] == 'Y':
+            c.drawString(coordinates_dict['PregYes'][0], coordinates_dict['PregYes'][1], 'X')
+        elif patient_dict['Pregnant'] == 'N':
+            c.drawString(coordinates_dict['PregNo'][0], coordinates_dict['PregNo'][1], 'X')
+        else:
+            c.drawString(coordinates_dict['PregUnk'][0], coordinates_dict['PregUnk'][1], 'X')
+    c.drawString(coordinates_dict['Physician'][0], coordinates_dict['Physician'][1], patient_dict['Physician'])
+    c.drawString(coordinates_dict['client_add'][0],coordinates_dict['client_add'][1], patient_dict['client_add'])
+    c.drawString(coordinates_dict['client_city'][0], coordinates_dict['client_city'][1], patient_dict['client_city'])
+    c.drawString(coordinates_dict['client_phone'][0], coordinates_dict['client_phone'][1], patient_dict['client_phone'])
+    c.drawString(coordinates_dict['client_state'][0], coordinates_dict['client_state'][1], patient_dict['client_state'])
+    c.drawString(coordinates_dict['client_zip'][0], coordinates_dict['client_zip'][1], patient_dict['client_zip'])
+    c.drawString(coordinates_dict['comments'][0], coordinates_dict['comments'][1], patient_dict['comments'])
+    c.drawString(coordinates_dict['diedunk'][0], coordinates_dict['diedunk'][1], 'X')
+    c.drawString(coordinates_dict['hospunk'][0], coordinates_dict['hospunk'][1], 'X')
+    c.drawString(coordinates_dict['treatedunk'][0], coordinates_dict['treatedunk'][1], 'X')
+    c.drawString(coordinates_dict['labtestyes'][0], coordinates_dict['labtestyes'][1], 'X')
+    c.drawString(6.61*72, 1.83*72, 'X')
+    c.save()
+    
+    '''#pdfrw
+    form = pdfrw.PdfReader(form_path)
+    markdown = pdfrw.PdfReader()
+    markdown = markdown.load_stream_objects(stream)
+    mark = markdown.pages[0]
+
+    for page in range(len(form.pages)):
+        merger = pdfrw.PageMerge(form.pages[page])
+        merger.add(mark).render()
+    
+    pdf_writer = pdfrw.PdfWriter()
+
+    for page in range(len(form.pages)):
+        pdf_writer.addpage(form.pages[page])
+
+
+    '''
+    # PyPDF2
+    form = PyPDF2.PdfFileReader(form_path)
+    markdown = PyPDF2.PdfFileReader(stream)
+
+    pdf_writer = PyPDF2.PdfFileWriter()
+
+    for page in range(form.getNumPages()):
+        form_page = form.getPage(page)
+        form_page.mergePage(markdown.getPage(0))
+        pdf_writer.addPage(form_page)
+
+    return pdf_writer
