@@ -10,6 +10,7 @@ Class: Emailer
 
 import smtplib
 import mimetypes
+
 from email.mime.multipart import MIMEMultipart
 from email import encoders
 from email.message import Message
@@ -17,6 +18,7 @@ from email.mime.audio import MIMEAudio
 from email.mime.base import MIMEBase
 from email.mime.image import MIMEImage
 from email.mime.text import MIMEText
+
 
 class Emailer:
     def __init__(self, email, password, subject, recipients):
@@ -27,6 +29,7 @@ class Emailer:
         self.email = email
         self.password = password
         self.attachments = []
+        print('initialized')
 
     def send(self):
         msg = MIMEMultipart('alternative')
@@ -46,7 +49,7 @@ class Emailer:
         s.starttls()
         s.login(self.email, self.password)
         s.sendmail(self.email, self.recipients, msg.as_string())
-        
+        print(msg)
         s.quit()
 
     def htmladd(self, html):
@@ -87,4 +90,3 @@ class Emailer:
     def addattach(self, files):
         self.attachments = self.attachments + files
 
-        
