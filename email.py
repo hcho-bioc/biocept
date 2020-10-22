@@ -8,9 +8,9 @@ Module contains class BioceptEmailer to send out automated emails to reciepients
 Class: Emailer
 """
 
+import os
 import smtplib
 import mimetypes
-
 from email.mime.multipart import MIMEMultipart
 from email import encoders
 from email.message import Message
@@ -29,7 +29,6 @@ class Emailer:
         self.email = email
         self.password = password
         self.attachments = []
-        print('initialized')
 
     def send(self):
         msg = MIMEMultipart('alternative')
@@ -49,7 +48,7 @@ class Emailer:
         s.starttls()
         s.login(self.email, self.password)
         s.sendmail(self.email, self.recipients, msg.as_string())
-        print(msg)
+
         s.quit()
 
     def htmladd(self, html):
@@ -57,6 +56,10 @@ class Emailer:
 
     def attach(self, msg):
         for f in self.attachments:
+            if os.path.isabs(f) == True:
+                fname = os.path.basename(f)
+            else:
+                fname = f
 
             ctype, encoding = mimetypes.guess_type(f)
             if ctype is None or encoding is not None:
@@ -83,8 +86,8 @@ class Emailer:
                 attachment.set_payload(fp.read())
                 fp.close()
                 encoders.encode_base64(attachment)
-            attachment.add_header('Content-Disposition', 'attachment', filename=f)
-            attachment.add_header('Content-ID', '<{}>'.format(f))
+            attachment.add_header('Content-Disposition', 'attachment', filename=fname)
+            attachment.add_header('Content-ID', '<{}>'.format(fname))
             msg.attach(attachment)
 
     def addattach(self, files):
