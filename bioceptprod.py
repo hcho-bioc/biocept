@@ -18,7 +18,6 @@ Module contains several methods for working with the database LiquidBigData
 import pyodbc
 import pandas as pd
 
-
 def connect(username,password):
 
     config = {
