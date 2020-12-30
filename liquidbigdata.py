@@ -79,6 +79,8 @@ def lastrun(connection, script_id):
 
     #this query returns the last run datetime of the script in PST (converted from UTC)
     query = f'''
+                DECLARE @timeoffset NVARCHAR(255) = (SELECT current_utc_offset FROM sys.time_zone_info WHERE name = 'Pacific Standard Time')
+
                 SELECT SWITCHOFFSET(MAX(ActivityTime), @timeoffset) FROM dbo.ScriptActivity WHERE ScriptId = \'{script_id}\' AND Successful = 1
             '''
 
