@@ -79,7 +79,7 @@ def lastrun(connection, script_id):
 
     #this query returns the last run datetime of the script in PST (converted from UTC)
     query = f'''
-                SELECT DATEADD(MINUTE,-420,MAX(ActivityTime)) FROM dbo.ScriptActivity WHERE ScriptId = \'{script_id}\' AND Successful = 1
+                SELECT SWITCHOFFSET(MAX(ActivityTime), @timeoffset) FROM dbo.ScriptActivity WHERE ScriptId = \'{script_id}\' AND Successful = 1
             '''
 
     cursor.execute(query)
