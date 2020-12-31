@@ -81,7 +81,7 @@ def lastrun(connection, script_id):
     query = f'''
                 DECLARE @timeoffset NVARCHAR(255) = (SELECT current_utc_offset FROM sys.time_zone_info WHERE name = 'Pacific Standard Time')
 
-                SELECT SWITCHOFFSET(MAX(ActivityTime), @timeoffset) FROM dbo.ScriptActivity WHERE ScriptId = \'{script_id}\' AND Successful = 1
+                SELECT CAST(SWITCHOFFSET(MAX(ActivityTime), @timeoffset) AS DATETIME) FROM dbo.ScriptActivity WHERE ScriptId = \'{script_id}\' AND Successful = 1
             '''
 
     cursor.execute(query)
